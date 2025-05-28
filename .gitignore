@@ -1,0 +1,11 @@
+__pycache__
+.DS_Store
+.venv
+.env
+.history
+secret
+dist
+~*
+.idea/
+example/patch
+.tox
