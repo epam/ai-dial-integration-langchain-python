@@ -16,7 +16,7 @@ build: install
 	$(UV) build
 
 publish: build
-	$(UV) publish --no-sources
+	$(UV) publish --username __token__ --password $(PYPI_TOKEN)
 
 clean:
 	rm -rf $(VENV_DIR)
