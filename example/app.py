@@ -1,6 +1,11 @@
 from pathlib import Path
 
 if (Path(__file__).parent / "aidial_integration_langchain").exists():
+    import os
+
+    os.environ["LC_EXTRA_REQUEST_MESSAGE_FIELDS"] = "extra_field"
+    os.environ["LC_EXTRA_RESPONSE_MESSAGE_FIELDS"] = "extra_field"
+    os.environ["LC_EXTRA_RESPONSE_FIELDS"] = "extra_field"
     import aidial_integration_langchain.patch  # isort:skip  # noqa: F401 # type: ignore
 
 import json
@@ -11,34 +16,44 @@ from langchain_core.outputs.chat_generation import ChatGeneration
 from langchain_openai import AzureChatOpenAI
 from pydantic import SecretStr
 
+_counter = 0
 
-def _report(idx: int, received: bool, message: str):
+
+def _report(received: bool, message: str):
+    global _counter
+    _counter += 1
     marker = "☑" if received else "☐"
-    print(f"({idx}) {marker} {message}")
+    print(f"({_counter}) {marker} {message}")
 
 
 class MockClient(httpx.Client):
     def send(self, request, **kwargs):
         request_dict = json.loads(request.content.decode())
 
-        # 1. per-message request extra
-        received = request_dict["messages"][0].get("custom_content") == {
-            "state": "foobar"
-        }
-        _report(1, received, "Request - in the `messages` list")
+        if "tools" in request_dict:
+            # 5. per-tool definition extra
+            received = (
+                request_dict["tools"][0].get("extra_field")
+                == "request.tools[0].extra_field"
+            )
+            _report(received, "request.tools[0].extra_field")
+        else:
 
-        # 2. top-level request extra
-        received = request_dict.get("custom_fields") == {
-            "configuration": {"a": "b"}
-        }
-        _report(2, received, "Request - on the top-level")
+            # 1. per-message request extra
+            received = (
+                request_dict["messages"][0].get("extra_field")
+                == "request.messages[0].extra_field"
+            )
+            _report(received, "request.messages[0].extra_field")
 
-        message = {
+            # 2. top-level request extra
+            received = request_dict.get("extra_field") == "request.extra_field"
+            _report(received, "request.extra_field")
+
+        response_message = {
             "role": "assistant",
             "content": "answer",
-            "custom_content": {
-                "attachments": []
-            },  # 3. per-message response extra
+            "extra_field": "response.message.extra_field",  # 3. per-message response extra
         }
 
         return httpx.Response(
@@ -46,8 +61,8 @@ class MockClient(httpx.Client):
             status_code=200,
             headers={"Content-Type": "application/json"},
             json={
-                "choices": [{"index": 0, "message": message}],
-                "statistics": {"a": "b"},  # 4. top-level response extra
+                "choices": [{"index": 0, "message": response_message}],
+                "extra_field": "response.extra_field",  # 4. top-level response extra
             },
         )
 
@@ -62,19 +77,26 @@ def main():
         max_retries=0,
     )
 
+    print("Received the following extra fields:")
+
+    tool = {
+        "type": "function",
+        "function": {"name": "dummy_tool", "parameters": {}},
+        "extra_field": "request.tools[0].extra_field",  # 5. per-tool definition extra
+    }
+    chat_client.bind_tools(tools=[tool]).invoke("2+2=?")
+
     request_message = HumanMessage(
         content="question",
         additional_kwargs={
-            "custom_content": {"state": "foobar"}
+            "extra_field": "request.messages[0].extra_field"
         },  # 1. per-message request extra
     )
-
-    print("Received extra fields in:")
 
     output = chat_client.generate(
         messages=[[request_message]],
         extra_body={
-            "custom_fields": {"configuration": {"a": "b"}}
+            "extra_field": "request.extra_field"
         },  # 2. top-level request extra
     )
 
@@ -82,14 +104,17 @@ def main():
     response: BaseMessage = generation.message
 
     # 3. per-message response extra
-    received = response.additional_kwargs.get("custom_content") == {
-        "attachments": []
-    }
-    _report(3, received, "Response - in the `message` field")
+    received = (
+        response.additional_kwargs.get("extra_field")
+        == "response.message.extra_field"
+    )
+    _report(received, "response.message.extra_field")
 
     # 4. top-level response extra
-    received = response.response_metadata.get("statistics") == {"a": "b"}
-    _report(4, received, "Response - on the top-level")
+    received = (
+        response.response_metadata.get("extra_field") == "response.extra_field"
+    )
+    _report(received, "response.extra_field")
 
 
 if __name__ == "__main__":

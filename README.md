@@ -6,7 +6,7 @@ The package provides useful integration of DIAL API with Langchain library.
 
 `langchain_openai` [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
 
-The minimal example highlighting the issue could be found in the [example folder](./example/):
+The minimal example highlighting the issue could be found in the [example folder](https://github.com/epam/ai-dial-integration-langchain-python/tree/development/example):
 
 ```sh
 > cd example
@@ -14,16 +14,17 @@ The minimal example highlighting the issue could be found in the [example folder
 > source .venv/bin/activate
 > pip install -q -r requirements.txt
 > python -m app
-Received extra fields in:
-(1) ☐ Request - in the `messages` list
-(2) ☑ Request - on the top-level
-(3) ☐ Response - in the `message` field
-(4) ☐ Response - on the top-level
+Received the following extra fields:
+(1) ☑ request.tools[0].extra_field
+(2) ☐ request.messages[0].extra_field
+(3) ☑ request.extra_field
+(4) ☐ response.message.extra_field
+(5) ☐ response.extra_field
 ```
 
-`langchain_openai` ignores certain extra fields, meaning that the upstream endpoint won't receive (1) and the client won't receive (3) and (4) if they were sent by the upstream.
+`langchain_openai` ignores certain extra fields, meaning that the upstream endpoint won't receive (2) and the client won't receive (4) and (5) if they were sent by the upstream.
 
-Note that **top-level request extra fields** do actually reach the upstream.
+Note that **top-level request extra fields** and **tool definition extra fields** do actually reach the upstream.
 
 ### Solution
 
@@ -51,11 +52,12 @@ The same example as above, but with the patch applied:
 > pip install -q -r requirements.txt
 > cp -r ../src/aidial_integration_langchain .
 > python -m app
-Received extra fields in:
-(1) ☑ Request - in the `messages` list
-(2) ☑ Request - on the top-level
-(3) ☑ Response - in the `message` field
-(4) ☑ Response - on the top-level
+Received the following extra fields:
+(1) ☑ request.tools[0].extra_field
+(2) ☑ request.messages[0].extra_field
+(3) ☑ request.extra_field
+(4) ☑ response.message.extra_field
+(5) ☑ response.extra_field
 ```
 
 ### Supported Langchain versions

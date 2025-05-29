@@ -16,13 +16,13 @@ async def run_test_langchain_block(monkey_patch: bool, is_azure: bool):
         test_case = get_langchain_test_case(monkey_patch, False)
         HumanMessage, get_client = lc
 
-        message = HumanMessage(
+        request_message = HumanMessage(
             content="question",
             additional_kwargs=test_case.request_message_extra[0].value,
         )
 
         output = await get_client(test_case).agenerate(
-            messages=[[message]],
+            messages=[[request_message]],
             extra_body=test_case.request_top_level_extra.value,
         )
 
