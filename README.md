@@ -4,7 +4,7 @@ The package provides useful integration of DIAL API with Langchain library.
 
 ## Passing DIAL-specific extra fields in Langchain requests/responses
 
-`langchain_openai` [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
+`langchain-openai` library [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
 
 The minimal example highlighting the issue could be found in the [example folder](https://github.com/epam/ai-dial-integration-langchain-python/tree/development/example):
 
@@ -22,7 +22,7 @@ Received the following extra fields:
 (5) ☐ response.extra_field
 ```
 
-`langchain_openai` ignores certain extra fields, meaning that the upstream endpoint won't receive (2) and the client won't receive (4) and (5) if they were sent by the upstream.
+`langchain-openai` ignores certain extra fields, meaning that the upstream endpoint won't receive (2) and the client won't receive (4) and (5) if they were sent by the upstream.
 
 Note that **top-level request extra fields** and **tool definition extra fields** do actually reach the upstream.
 
@@ -30,7 +30,7 @@ Note that **top-level request extra fields** and **tool definition extra fields*
 
 One way to *fix* the issue, is to modify the Langchain methods that ignore these extra fields so that they are taken into account.
 
-This is achieved via monkey-patching certain private methods in `langchain_openai` that do the conversion from the Langchain datatypes to dictionaries and vice versa.
+This is achieved via monkey-patching certain private methods in `langchain-openai` that do the conversion from the Langchain datatypes to dictionaries and vice versa.
 
 ### Usage
 
@@ -62,17 +62,17 @@ Received the following extra fields:
 
 ### Supported Langchain versions
 
-The following `langchain_openai` versions have been tested for Python 3.9, 3.10, 3.11, 3.12, and 3.13:
+The following `langchain-openai` versions have been tested for Python 3.9, 3.10, 3.11, 3.12, and 3.13:
 
 |Version|Request per-message|Response per-message|Response top-level|
 |---|---|---|---|
 |>=0.1.1,<=0.1.22|🟢|🟢|🔴|
 |>=0.1.23,<=0.1.25|🟢|🟢|🟢|
 |>=0.2.0,<=0.2.14|🟢|🟢|🟢|
-|>=0.3.0,<=0.3.16|🟢|🟢|🟢|
+|>=0.3.0,<=0.3.18|🟢|🟢|🟢|
 
 > [!NOTE]
-> The patch for `langchain_openai<=0.1.22` doesn't support response top-level extra fields, since the structure of the code back then was not very amicable for monkey-patching in this particular respect.
+> The patched `langchain-openai<=0.1.22` doesn't support response top-level extra fields, since the structure of the code back then was not very amicable for monkey-patching in this particular respect.
 
 ### Configuration
 
