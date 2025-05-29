@@ -12,7 +12,6 @@ name = "aidial-integration-langchain"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "httpx" },
     { name = "langchain" },
     { name = "langchain-core" },
     { name = "langchain-openai" },
@@ -28,6 +27,7 @@ lint = [
     { name = "pyright" },
 ]
 test = [
+    { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
@@ -37,7 +37,7 @@ requires-dist = [
     { name = "autoflake", marker = "extra == 'lint'", specifier = ">=2.2.0" },
     { name = "black", marker = "extra == 'lint'", specifier = ">=23.3,<25.0" },
     { name = "flake8", marker = "extra == 'lint'", specifier = ">=6.0.0" },
-    { name = "httpx", specifier = "==0.27.2" },
+    { name = "httpx", marker = "extra == 'test'", specifier = "==0.27.2" },
     { name = "isort", marker = "extra == 'lint'", specifier = ">=5.12.0" },
     { name = "langchain", specifier = "<0.4" },
     { name = "langchain-core", specifier = "<0.4" },

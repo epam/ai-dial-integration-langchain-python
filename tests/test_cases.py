@@ -1,25 +1,19 @@
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator
 
 from openai import AsyncClient
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
 
 from tests.client import TestHTTPClient
 from tests.test_case import TestCase
-from tests.utils import (
-    PatchType,
-    get_langchain_manager,
-    get_langchain_test_case,
-)
+from tests.utils import get_langchain_test_case, with_langchain
 
 _TOP_LEVEL_ERROR = "Unexpected result for the response top-level extra field"
 _MESSAGE_ERROR = "Unexpected result for the response message extra field"
 
 
-async def run_test_langchain_block(
-    patch_mode: Optional[PatchType], is_azure: bool
-):
-    with get_langchain_manager(patch_mode, is_azure) as lc:
-        test_case = get_langchain_test_case(patch_mode, False)
+async def run_test_langchain_block(monkey_patch: bool, is_azure: bool):
+    with with_langchain(is_azure, monkey_patch) as lc:
+        test_case = get_langchain_test_case(monkey_patch, False)
         HumanMessage, get_client = lc
 
         message = HumanMessage(
@@ -44,11 +38,9 @@ async def run_test_langchain_block(
         )
 
 
-async def run_test_langchain_streaming(
-    patch_mode: Optional[PatchType], is_azure: bool
-):
-    with get_langchain_manager(patch_mode, is_azure) as lc:
-        test_case = get_langchain_test_case(patch_mode, True)
+async def run_test_langchain_streaming(monkey_patch: bool, is_azure: bool):
+    with with_langchain(is_azure, monkey_patch) as lc:
+        test_case = get_langchain_test_case(monkey_patch, True)
         HumanMessage, get_client = lc
 
         request_message = HumanMessage(

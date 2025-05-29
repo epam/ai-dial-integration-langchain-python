@@ -1,7 +1,7 @@
 from pathlib import Path
 
-if (Path(__file__).parent / "patch").exists():
-    import patch  # isort:skip  # noqa: F401 # type: ignore
+if (Path(__file__).parent / "aidial_integration_langchain").exists():
+    import aidial_integration_langchain.patch  # isort:skip  # noqa: F401 # type: ignore
 
 import json
 

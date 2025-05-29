@@ -8,9 +8,9 @@ from tests.test_cases import (
 
 @pytest.mark.parametrize("is_azure", [True, False])
 async def test_langchain_block(is_azure):
-    await run_test_langchain_block(None, is_azure)
+    await run_test_langchain_block(False, is_azure)
 
 
 @pytest.mark.parametrize("is_azure", [True, False])
 async def test_langchain_streaming(is_azure):
-    await run_test_langchain_streaming(None, is_azure)
+    await run_test_langchain_streaming(False, is_azure)

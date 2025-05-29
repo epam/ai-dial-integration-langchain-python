@@ -1,9 +1,8 @@
 import importlib
 import sys
 from contextlib import contextmanager
-from enum import Enum
 from importlib.metadata import version
-from typing import Optional, Tuple
+from typing import Tuple
 
 from packaging.version import Version
 
@@ -40,7 +39,7 @@ def unload_module(module: str):
 
 
 @contextmanager
-def with_langchain(is_azure: bool, is_custom_class: bool, monkey_patch: bool):
+def with_langchain(is_azure: bool, monkey_patch: bool):
     patch_module = "aidial_integration_langchain.patch"
 
     unload_langchain()
@@ -49,11 +48,7 @@ def with_langchain(is_azure: bool, is_custom_class: bool, monkey_patch: bool):
         importlib.import_module(patch_module)
 
     langchain_core = importlib.import_module("langchain_core")
-    langchain_openai = importlib.import_module(
-        "aidial_integration_langchain.langchain_openai"
-        if is_custom_class
-        else "langchain_openai"
-    )
+    langchain_openai = importlib.import_module("langchain_openai")
 
     def get_langchain_chat_client(test_case: TestCase):
         cls, extra_kwargs = (
@@ -79,41 +74,15 @@ def with_langchain(is_azure: bool, is_custom_class: bool, monkey_patch: bool):
     unload_langchain()
 
 
-class PatchType(int, Enum):
-    MONKEY_PATCH = 0
-    CUSTOM_CLASS = 1
-
-
-@contextmanager
-def get_langchain_manager(patch_mode: Optional[PatchType], is_azure: bool):
-    if patch_mode is None:
-        with with_langchain(is_azure, False, False) as lc:
-            yield lc
-    elif patch_mode == PatchType.MONKEY_PATCH:
-        with with_langchain(is_azure, False, True) as lc:
-            yield lc
-    elif patch_mode == PatchType.CUSTOM_CLASS:
-        with with_langchain(is_azure, True, False) as lc:
-            yield lc
-    else:
-        raise RuntimeError(f"Unexpected patch mode: {patch_mode}")
-
-
 def get_openai_test_case():
     return create_test_case((True, True, True, True))
 
 
-def get_langchain_test_case(
-    patch_mode: Optional[PatchType], stream: bool
-) -> TestCase:
-    if patch_mode is None:
+def get_langchain_test_case(monkey_patch: bool, stream: bool) -> TestCase:
+    if not monkey_patch:
         return create_test_case((True, False, False, False))
     else:
-        if (
-            patch_mode == PatchType.MONKEY_PATCH
-            and Version(version("langchain_openai")) <= Version("0.1.22")
-            and stream
-        ):
+        if Version(version("langchain_openai")) <= Version("0.1.22") and stream:
             # There is no easy way to patch langchain_openai<=0.1.22 to make it
             # return top-level extra response fields
             return create_test_case((True, True, False, True))

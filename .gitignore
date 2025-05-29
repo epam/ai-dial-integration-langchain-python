@@ -7,5 +7,4 @@ secret
 dist
 ~*
 .idea/
-example/patch
 .tox

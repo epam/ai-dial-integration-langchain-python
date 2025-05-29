@@ -1,12 +1,12 @@
 # Overview
 
+The package provides useful integration of DIAL API with Langchain library.
+
+## Passing DIAL-specific extra fields in Langchain requests/responses
+
 `langchain_openai` [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
 
-The repo provides ways to overcome this issue.
-
-## Minimal example
-
-Find the minimal example highlighting the issue with `langchain_openai` at the [example folder](./example/):
+The minimal example highlighting the issue could be found in the [example folder](./example/):
 
 ```sh
 > cd example
@@ -25,22 +25,31 @@ Received extra fields in:
 
 Note that **top-level request extra fields** do actually reach the upstream.
 
-## Solution #1 *(monkey-patching the library)*
+### Solution
 
-One way to *fix* the issue, is to modify the methods which ignore these extra fields and make the methods actually take them into account.
+One way to *fix* the issue, is to modify the Langchain methods that ignore these extra fields so that they are taken into account.
 
-This is achieved via monkey-patching certain private methods in `langchain_openai` which do the conversion from the Langchain datatypes to dictionaries and vice versa.
+This is achieved via monkey-patching certain private methods in `langchain_openai` that do the conversion from the Langchain datatypes to dictionaries and vice versa.
 
 ### Usage
 
-Copy [the patch modules](./src/aidial_integration_langchain/patch/) to your project, then import before any Langchain module is imported.
+Import `aidial_integration_langchain` before importing any Langchain module to apply the patches:
+
+```python
+import aidial_integration_langchain.patch # isort:skip  # noqa: F401 # type: ignore
+
+from langchain_openai import AzureChatOpenAI
+...
+```
+
+The same example as above, but with the patch applied:
 
 ```sh
 > cd example
 > python -m venv .venv
 > source .venv/bin/activate
 > pip install -q -r requirements.txt
-> cp -r ../src/aidial_integration_langchain/patch .
+> cp -r ../src/aidial_integration_langchain .
 > python -m app
 Received extra fields in:
 (1) ☑ Request - in the `messages` list
@@ -49,7 +58,7 @@ Received extra fields in:
 (4) ☑ Response - on the top-level
 ```
 
-### Supported versions
+### Supported Langchain versions
 
 The following `langchain_openai` versions have been tested for Python 3.9, 3.10, 3.11, 3.12, and 3.13:
 
@@ -60,36 +69,15 @@ The following `langchain_openai` versions have been tested for Python 3.9, 3.10,
 |>=0.2.0,<=0.2.14|🟢|🟢|🟢|
 |>=0.3.0,<=0.3.16|🟢|🟢|🟢|
 
-Note that `langchain_openai<=0.1.22` doesn't support response top-level extra fields, since the structure of the code back then was not very amicable for monkey-patching in this particular respect.
+> [!NOTE]
+> The patch for `langchain_openai<=0.1.22` doesn't support response top-level extra fields, since the structure of the code back then was not very amicable for monkey-patching in this particular respect.
 
-## Solution #2 *(custom AzureChatOpenAI class)*
-
-The implementation of the `AzureChatOpenAI` class may be copied and modified as needed to take into account extra fields.
-
-Find the redefined classes at [aidial_integration_langchain.langchain_openai](./src/aidial_integration_langchain/langchain_openai/).
-
-### Usage
-
-Simply import the `AzureChatOpenAI` class from this repo instead of `langchain_openai`:
-
-```diff
-# ./example/app.py
-- from langchain_openai import AzureChatOpenAI
-+ from aidial_integration_langchain.langchain_openai import AzureChatOpenAI
-```
-
-### Supported versions
-
-Currently only `langchain_openai==0.2.0` is supported for Python 3.9, 3.10, 3.11 and 3.12.
-
-## Environment variables
+### Configuration
 
 The list of extra fields that are allowed to pass-through is controlled by the following environment variables.
 
-|Name|Default|
-|---|---|
-|LC_EXTRA_REQUEST_MESSAGE_FIELDS|custom_content|
-|LC_EXTRA_RESPONSE_MESSAGE_FIELDS|custom_content|
-|LC_EXTRA_RESPONSE_FIELDS|statistics|
-
-Each contains a comma-separated list of field names.
+|Name|Default|Description|
+|---|---|---|
+|LC_EXTRA_REQUEST_MESSAGE_FIELDS|custom_content|A comma-separated list of extra message fields allowed to pass-through in chat completion requests.|
+|LC_EXTRA_RESPONSE_MESSAGE_FIELDS|custom_content|A comma-separated list of extra message fields allowed to pass-through in chat completion responses.|
+|LC_EXTRA_RESPONSE_FIELDS|statistics|A comma-separated list of extra fields allowed to pass-through on the top-level of the chat completion responses.|
