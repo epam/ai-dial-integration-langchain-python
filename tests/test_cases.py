@@ -1,6 +1,7 @@
 from typing import AsyncIterator
 
 from openai import AsyncClient
+from openai.types.chat import ChatCompletion
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
 
 from tests.client import TestHTTPClient
@@ -86,3 +87,29 @@ async def run_test_openai_stream(test_case: TestCase):
 
         if test := test_case.response_message_extra:
             test.assert_is_valid(chunk["choices"][0]["delta"], _MESSAGE_ERROR)
+
+
+async def run_test_openai_block(test_case: TestCase):
+    http_client = TestHTTPClient(test_case=test_case)
+    openai_client = AsyncClient(api_key="dummy-key", http_client=http_client)
+
+    response: ChatCompletion = await openai_client.chat.completions.create(
+        stream=False,
+        model="dummy",
+        messages=[
+            {
+                "role": "user",
+                "content": "question",
+                **test_case.request_message_extra_fields(0),
+            }  # type: ignore
+        ],
+        extra_body=test_case.request_top_level_extra_fields,
+    )  # type: ignore
+
+    chunk = response.model_dump()
+
+    if test := test_case.response_top_level_extra:
+        test.assert_is_valid(chunk, _TOP_LEVEL_ERROR)
+
+    if test := test_case.response_message_extra:
+        test.assert_is_valid(chunk["choices"][0]["message"], _MESSAGE_ERROR)

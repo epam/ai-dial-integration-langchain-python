@@ -4,7 +4,7 @@ The package provides useful integration of DIAL API with Langchain library.
 
 ## Passing DIAL-specific extra fields in Langchain requests/responses
 
-`langchain-openai` library [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
+Unlike `openai` library, `langchain-openai` library [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
 
 The minimal example highlighting the issue could be found in the [example folder](https://github.com/epam/ai-dial-integration-langchain-python/tree/development/example):
 
