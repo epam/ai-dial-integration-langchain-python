@@ -25,16 +25,18 @@ class TestHTTPClient(httpx.AsyncClient):
 
         errors: List[str] = []
 
-        if not self.test_case.request_top_level_extra.is_valid(request_dict):
-            errors.append(
-                "Unexpected result for the request top-level extra field"
-            )
-
-        for idx, value in self.test_case.request_message_extra.items():
-            if not value.is_valid(request_dict["messages"][idx]):
+        if test := self.test_case.request_top_level_extra:
+            if not test.is_valid(request_dict):
                 errors.append(
-                    f"Unexpected result for the request message[{idx}] extra field"
+                    "Unexpected result for the request top-level extra field"
                 )
+
+        if test := self.test_case.request_message_extra:
+            for idx, value in test.items():
+                if value and not value.is_valid(request_dict["messages"][idx]):
+                    errors.append(
+                        f"Unexpected result for the request message[{idx}] extra field"
+                    )
 
         if errors:
             return httpx.Response(
@@ -46,7 +48,7 @@ class TestHTTPClient(httpx.AsyncClient):
         message = {
             "role": "assistant",
             "content": "answer",
-            **self.test_case.response_message_extra.value,
+            **self.test_case.response_message_extra_fields,
         }
 
         stream = request_dict.get("stream") is True
@@ -64,7 +66,7 @@ class TestHTTPClient(httpx.AsyncClient):
                 "completion_tokens": 2,
                 "total_tokens": 3,
             },
-            **self.test_case.response_top_level_extra.value,
+            **self.test_case.response_top_level_extra_fields,
         }
 
         if stream:

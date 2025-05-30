@@ -1,4 +1,6 @@
-from typing import Dict
+from __future__ import annotations
+
+from typing import Dict, Optional
 
 from openai import BaseModel
 
@@ -15,7 +17,11 @@ class IncludeTest(BaseModel):
     value: dict
 
     @classmethod
-    def create(cls, include: bool, value: dict):
+    def create(
+        cls, include: Optional[bool], value: dict
+    ) -> Optional[IncludeTest]:
+        if include is None:
+            return None
         return cls(include=include, value=value)
 
     def is_valid(self, other: dict) -> bool:
@@ -32,7 +38,32 @@ class IncludeTest(BaseModel):
 class TestCase(BaseModel):
     __test__ = False
 
-    request_top_level_extra: IncludeTest
-    request_message_extra: Dict[int, IncludeTest]
-    response_top_level_extra: IncludeTest
-    response_message_extra: IncludeTest
+    request_top_level_extra: Optional[IncludeTest] = None
+    request_message_extra: Optional[Dict[int, Optional[IncludeTest]]] = None
+    response_top_level_extra: Optional[IncludeTest] = None
+    response_message_extra: Optional[IncludeTest] = None
+
+    def request_message_extra_fields(self, idx: int) -> Dict[int, dict]:
+        if not self.request_message_extra:
+            return {}
+        if test := self.request_message_extra.get(idx):
+            return test.value
+        return {}
+
+    @property
+    def request_top_level_extra_fields(self) -> dict:
+        if not self.request_top_level_extra:
+            return {}
+        return self.request_top_level_extra.value
+
+    @property
+    def response_message_extra_fields(self) -> dict:
+        if not self.response_message_extra:
+            return {}
+        return self.response_message_extra.value
+
+    @property
+    def response_top_level_extra_fields(self) -> dict:
+        if not self.response_top_level_extra:
+            return {}
+        return self.response_top_level_extra.value
