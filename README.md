@@ -9,11 +9,14 @@ The package provides useful integration of DIAL API with Langchain library.
 The minimal example highlighting the issue could be found in the [example folder](https://github.com/epam/ai-dial-integration-langchain-python/tree/development/example):
 
 ```sh
-> cd example
-> python -m venv .venv
-> source .venv/bin/activate
-> pip install -q -r requirements.txt
-> python -m app
+cd example
+python -m venv .venv
+source .venv/bin/activate
+pip install -q -r requirements.txt
+python -m app
+```
+
+```text
 Received the following extra fields:
 (1) ☑ request.tools[0].extra_field
 (2) ☐ request.messages[0].extra_field
@@ -34,7 +37,13 @@ This is achieved via monkey-patching certain private methods in `langchain-opena
 
 ### Usage
 
-Import `aidial_integration_langchain` before importing any Langchain module to apply the patches:
+Install the `aidial-integration-langchain` package as a dependency in your project:
+
+```sh
+pip install aidial-integration-langchain
+```
+
+Then import `aidial_integration_langchain` before importing any Langchain module to apply the patches:
 
 ```python
 import aidial_integration_langchain.patch # isort:skip  # noqa: F401 # type: ignore
@@ -46,12 +55,15 @@ from langchain_openai import AzureChatOpenAI
 The same example as above, but with the patch applied:
 
 ```sh
-> cd example
-> python -m venv .venv
-> source .venv/bin/activate
-> pip install -q -r requirements.txt
-> cp -r ../src/aidial_integration_langchain .
-> python -m app
+cd example
+python -m venv .venv
+source .venv/bin/activate
+pip install -q -r requirements.txt
+pip install -q aidial-integration-langchain
+python -m app patch
+```
+
+```text
 Received the following extra fields:
 (1) ☑ request.tools[0].extra_field
 (2) ☑ request.messages[0].extra_field

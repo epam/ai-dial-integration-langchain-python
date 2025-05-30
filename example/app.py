@@ -1,6 +1,14 @@
-from pathlib import Path
+import importlib.util
+import sys
 
-if (Path(__file__).parent / "aidial_integration_langchain").exists():
+if len(sys.argv) > 1 and sys.argv[1] == "patch":
+    if not importlib.util.find_spec("aidial_integration_langchain"):
+        print(
+            "Error: aidial-integration-langchain package isn't installed. "
+            "Try running `pip install aidial-integration-langchain` first."
+        )
+        sys.exit(1)
+
     import os
 
     os.environ["LC_EXTRA_REQUEST_MESSAGE_FIELDS"] = "extra_field"
