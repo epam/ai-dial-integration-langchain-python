@@ -30,10 +30,10 @@ async def run_test_langchain_block(monkey_patch: bool, is_azure: bool):
         generation = output.generations[0][0]
         response = generation.message
 
-        if test := test_case.response_top_level_extra:
+        if test := test_case.response_top_level:
             test.assert_is_valid(response.response_metadata, _TOP_LEVEL_ERROR)
 
-        if test := test_case.response_message_extra:
+        if test := test_case.response_message:
             test.assert_is_valid(response.additional_kwargs, _MESSAGE_ERROR)
 
 
@@ -53,10 +53,10 @@ async def run_test_langchain_streaming(monkey_patch: bool, is_azure: bool):
         )
 
         async for chunk in stream:
-            if test := test_case.response_top_level_extra:
+            if test := test_case.response_top_level:
                 test.assert_is_valid(chunk.response_metadata, _TOP_LEVEL_ERROR)
 
-            if test := test_case.response_message_extra:
+            if test := test_case.response_message:
                 test.assert_is_valid(chunk.additional_kwargs, _MESSAGE_ERROR)
 
 
@@ -92,10 +92,10 @@ async def run_test_openai_stream(test_case: TestCase):
     async for c in stream:
         chunk = c.model_dump()
 
-        if test := test_case.response_top_level_extra:
+        if test := test_case.response_top_level:
             test.assert_is_valid(chunk, _TOP_LEVEL_ERROR)
 
-        if test := test_case.response_message_extra:
+        if test := test_case.response_message:
             test.assert_is_valid(chunk["choices"][0]["delta"], _MESSAGE_ERROR)
 
 
@@ -128,8 +128,8 @@ async def run_test_openai_block(test_case: TestCase):
 
     chunk = response.model_dump()
 
-    if test := test_case.response_top_level_extra:
+    if test := test_case.response_top_level:
         test.assert_is_valid(chunk, _TOP_LEVEL_ERROR)
 
-    if test := test_case.response_message_extra:
+    if test := test_case.response_message:
         test.assert_is_valid(chunk["choices"][0]["message"], _MESSAGE_ERROR)

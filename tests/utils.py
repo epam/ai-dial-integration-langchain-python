@@ -13,31 +13,29 @@ inc = IncludeTest.create
 
 
 def create_test_case(
-    request_top_level_extra: Optional[bool] = None,
-    request_tool_definition_extra: Optional[bool] = None,
-    request_message_extra: Optional[bool] = None,
-    response_top_level_extra: Optional[bool] = None,
-    response_message_extra: Optional[bool] = None,
+    request_top_level: Optional[bool] = None,
+    request_tool_definition: Optional[bool] = None,
+    request_message: Optional[bool] = None,
+    response_top_level: Optional[bool] = None,
+    response_message: Optional[bool] = None,
 ) -> TestCase:
     return TestCase(
-        request_tool_definition_extra={
-            0: inc(request_tool_definition_extra, {"custom_fields": "foobar"})
+        request_tool_definition={
+            0: inc(request_tool_definition, {"custom_fields": "foobar"})
         },
-        request_top_level_extra=inc(
-            request_top_level_extra,
+        request_top_level=inc(
+            request_top_level,
             {"custom_fields": {"configuration": {"a": "b"}}},
         ),
-        request_message_extra={
+        request_message={
             0: inc(
-                request_message_extra,
+                request_message,
                 {"custom_content": {"state": "foobar"}},
             )
         },
-        response_top_level_extra=inc(
-            response_top_level_extra, {"statistics": {"a": "b"}}
-        ),
-        response_message_extra=inc(
-            response_message_extra, {"custom_content": {"attachments": []}}
+        response_top_level=inc(response_top_level, {"statistics": {"a": "b"}}),
+        response_message=inc(
+            response_message, {"custom_content": {"attachments": []}}
         ),
     )
 
@@ -91,21 +89,21 @@ def with_langchain(is_azure: bool, monkey_patch: bool):
 
 def get_openai_test_case():
     return create_test_case(
-        request_tool_definition_extra=True,
-        request_top_level_extra=True,
-        request_message_extra=True,
-        response_top_level_extra=True,
-        response_message_extra=True,
+        request_tool_definition=True,
+        request_top_level=True,
+        request_message=True,
+        response_top_level=True,
+        response_message=True,
     )
 
 
 def get_langchain_test_case(monkey_patch: bool, stream: bool) -> TestCase:
     if not monkey_patch:
         return create_test_case(
-            request_top_level_extra=True,
-            request_message_extra=False,
-            response_top_level_extra=False,
-            response_message_extra=False,
+            request_top_level=True,
+            request_message=False,
+            response_top_level=False,
+            response_message=False,
         )
     else:
         response_top_level_extra = True
@@ -115,8 +113,8 @@ def get_langchain_test_case(monkey_patch: bool, stream: bool) -> TestCase:
             response_top_level_extra = False
 
         return create_test_case(
-            request_top_level_extra=True,
-            request_message_extra=True,
-            response_top_level_extra=response_top_level_extra,
-            response_message_extra=True,
+            request_top_level=True,
+            request_message=True,
+            response_top_level=response_top_level_extra,
+            response_message=True,
         )

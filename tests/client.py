@@ -25,13 +25,13 @@ class TestHTTPClient(httpx.AsyncClient):
 
         errors: List[str] = []
 
-        if test := self.test_case.request_top_level_extra:
+        if test := self.test_case.request_top_level:
             if not test.is_valid(request_dict):
                 errors.append(
                     "Unexpected result for the request top-level extra field"
                 )
 
-        if test := self.test_case.request_tool_definition_extra:
+        if test := self.test_case.request_tool_definition:
             for idx, value in test.items():
                 if value and not value.is_valid(
                     request_dict["tools"][idx]["function"]
@@ -40,7 +40,7 @@ class TestHTTPClient(httpx.AsyncClient):
                         f"Unexpected result for the request tool definition[{idx}] extra field"
                     )
 
-        if test := self.test_case.request_message_extra:
+        if test := self.test_case.request_message:
             for idx, value in test.items():
                 if value and not value.is_valid(request_dict["messages"][idx]):
                     errors.append(

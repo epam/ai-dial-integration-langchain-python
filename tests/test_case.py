@@ -38,42 +38,40 @@ class IncludeTest(BaseModel):
 class TestCase(BaseModel):
     __test__ = False
 
-    request_top_level_extra: Optional[IncludeTest] = None
-    request_tool_definition_extra: Optional[
-        Dict[int, Optional[IncludeTest]]
-    ] = None
-    request_message_extra: Optional[Dict[int, Optional[IncludeTest]]] = None
-    response_top_level_extra: Optional[IncludeTest] = None
-    response_message_extra: Optional[IncludeTest] = None
+    request_top_level: Optional[IncludeTest] = None
+    request_tool_definition: Optional[Dict[int, Optional[IncludeTest]]] = None
+    request_message: Optional[Dict[int, Optional[IncludeTest]]] = None
+    response_top_level: Optional[IncludeTest] = None
+    response_message: Optional[IncludeTest] = None
 
     def request_message_extra_fields(self, idx: int) -> Dict[int, dict]:
-        if not self.request_message_extra:
+        if not self.request_message:
             return {}
-        if test := self.request_message_extra.get(idx):
+        if test := self.request_message.get(idx):
             return test.value
         return {}
 
     def request_tool_definition_extra_fields(self, idx: int) -> Dict[int, dict]:
-        if not self.request_tool_definition_extra:
+        if not self.request_tool_definition:
             return {}
-        if test := self.request_tool_definition_extra.get(idx):
+        if test := self.request_tool_definition.get(idx):
             return test.value
         return {}
 
     @property
     def request_top_level_extra_fields(self) -> dict:
-        if not self.request_top_level_extra:
+        if not self.request_top_level:
             return {}
-        return self.request_top_level_extra.value
+        return self.request_top_level.value
 
     @property
     def response_message_extra_fields(self) -> dict:
-        if not self.response_message_extra:
+        if not self.response_message:
             return {}
-        return self.response_message_extra.value
+        return self.response_message.value
 
     @property
     def response_top_level_extra_fields(self) -> dict:
-        if not self.response_top_level_extra:
+        if not self.response_top_level:
             return {}
-        return self.response_top_level_extra.value
+        return self.response_top_level.value
