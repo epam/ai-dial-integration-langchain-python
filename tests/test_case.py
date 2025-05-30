@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from openai import BaseModel
+from openai.types.chat import ChatCompletionToolParam
 
 
 def _is_subdict(small: dict, big: dict) -> bool:
@@ -75,3 +76,15 @@ class TestCase(BaseModel):
         if not self.response_top_level:
             return {}
         return self.response_top_level.value
+
+    def create_tools(self) -> List[ChatCompletionToolParam]:
+        return [
+            {
+                "type": "function",
+                "function": {
+                    "name": "dummy_function",
+                    "description": "A dummy function for testing.",
+                },
+                **self.request_tool_definition_extra_fields(0),  # type: ignore
+            }
+        ]

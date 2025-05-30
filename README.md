@@ -18,9 +18,9 @@ python -m app
 
 ```text
 Received the following extra fields:
-(1) ☑ request.tools[0].extra_field
-(2) ☐ request.messages[0].extra_field
-(3) ☑ request.extra_field
+(1) ☑ request.extra_field
+(2) ☑ request.tools[0].extra_field
+(3) ☐ request.messages[0].extra_field
 (4) ☐ response.message.extra_field
 (5) ☐ response.extra_field
 ```
@@ -65,9 +65,9 @@ python -m app patch
 
 ```text
 Received the following extra fields:
-(1) ☑ request.tools[0].extra_field
-(2) ☑ request.messages[0].extra_field
-(3) ☑ request.extra_field
+(1) ☑ request.extra_field
+(2) ☑ request.tools[0].extra_field
+(3) ☑ request.messages[0].extra_field
 (4) ☑ response.message.extra_field
 (5) ☑ response.extra_field
 ```

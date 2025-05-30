@@ -20,13 +20,13 @@ def create_test_case(
     response_message: Optional[bool] = None,
 ) -> TestCase:
     return TestCase(
-        request_tool_definition={
-            0: inc(request_tool_definition, {"custom_fields": "foobar"})
-        },
         request_top_level=inc(
             request_top_level,
             {"custom_fields": {"configuration": {"a": "b"}}},
         ),
+        request_tool_definition={
+            0: inc(request_tool_definition, {"custom_fields": "foobar"})
+        },
         request_message={
             0: inc(
                 request_message,
@@ -89,8 +89,8 @@ def with_langchain(is_azure: bool, monkey_patch: bool):
 
 def get_openai_test_case():
     return create_test_case(
-        request_tool_definition=True,
         request_top_level=True,
+        request_tool_definition=True,
         request_message=True,
         response_top_level=True,
         response_message=True,
@@ -101,6 +101,7 @@ def get_langchain_test_case(monkey_patch: bool, stream: bool) -> TestCase:
     if not monkey_patch:
         return create_test_case(
             request_top_level=True,
+            request_tool_definition=True,
             request_message=False,
             response_top_level=False,
             response_message=False,
@@ -114,6 +115,7 @@ def get_langchain_test_case(monkey_patch: bool, stream: bool) -> TestCase:
 
         return create_test_case(
             request_top_level=True,
+            request_tool_definition=True,
             request_message=True,
             response_top_level=response_top_level_extra,
             response_message=True,

@@ -17,18 +17,18 @@ async def run_test_langchain_block(monkey_patch: bool, is_azure: bool):
         test_case = get_langchain_test_case(monkey_patch, False)
         HumanMessage, get_client = lc
 
+        client = get_client(test_case)
+        client = client.bind_tools(test_case.create_tools())
+
         request_message = HumanMessage(
             content="question",
             additional_kwargs=test_case.request_message_extra_fields(0),
         )
 
-        output = await get_client(test_case).agenerate(
-            messages=[[request_message]],
+        response = await client.ainvoke(
+            input=[request_message],
             extra_body=test_case.request_top_level_extra_fields,
         )
-
-        generation = output.generations[0][0]
-        response = generation.message
 
         if test := test_case.response_top_level:
             test.assert_is_valid(response.response_metadata, _TOP_LEVEL_ERROR)
@@ -42,12 +42,15 @@ async def run_test_langchain_streaming(monkey_patch: bool, is_azure: bool):
         test_case = get_langchain_test_case(monkey_patch, True)
         HumanMessage, get_client = lc
 
+        client = get_client(test_case)
+        client = client.bind_tools(test_case.create_tools())
+
         request_message = HumanMessage(
             content="question",
             additional_kwargs=test_case.request_message_extra_fields(0),
         )
 
-        stream = get_client(test_case).astream(
+        stream = client.astream(
             input=[request_message],
             extra_body=test_case.request_top_level_extra_fields,
         )
@@ -69,16 +72,7 @@ async def run_test_openai_stream(test_case: TestCase):
     ] = await openai_client.chat.completions.create(
         stream=True,
         model="dummy",
-        tools=[
-            {
-                "type": "function",
-                "function": {  # type: ignore
-                    "name": "dummy_function",
-                    "description": "A dummy function for testing.",
-                    **test_case.request_tool_definition_extra_fields(0),
-                },
-            }
-        ],
+        tools=test_case.create_tools(),
         messages=[
             {
                 "role": "user",
@@ -106,16 +100,7 @@ async def run_test_openai_block(test_case: TestCase):
     response: ChatCompletion = await openai_client.chat.completions.create(
         stream=False,
         model="dummy",
-        tools=[
-            {
-                "type": "function",
-                "function": {  # type: ignore
-                    "name": "dummy_function",
-                    "description": "A dummy function for testing.",
-                    **test_case.request_tool_definition_extra_fields(0),
-                },
-            }
-        ],
+        tools=test_case.create_tools(),
         messages=[
             {
                 "role": "user",

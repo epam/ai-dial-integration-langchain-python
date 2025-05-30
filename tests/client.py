@@ -33,9 +33,7 @@ class TestHTTPClient(httpx.AsyncClient):
 
         if test := self.test_case.request_tool_definition:
             for idx, value in test.items():
-                if value and not value.is_valid(
-                    request_dict["tools"][idx]["function"]
-                ):
+                if value and not value.is_valid(request_dict["tools"][idx]):
                     errors.append(
                         f"Unexpected result for the request tool definition[{idx}] extra field"
                     )
