@@ -39,6 +39,9 @@ class TestCase(BaseModel):
     __test__ = False
 
     request_top_level_extra: Optional[IncludeTest] = None
+    request_tool_definition_extra: Optional[
+        Dict[int, Optional[IncludeTest]]
+    ] = None
     request_message_extra: Optional[Dict[int, Optional[IncludeTest]]] = None
     response_top_level_extra: Optional[IncludeTest] = None
     response_message_extra: Optional[IncludeTest] = None
@@ -47,6 +50,13 @@ class TestCase(BaseModel):
         if not self.request_message_extra:
             return {}
         if test := self.request_message_extra.get(idx):
+            return test.value
+        return {}
+
+    def request_tool_definition_extra_fields(self, idx: int) -> Dict[int, dict]:
+        if not self.request_tool_definition_extra:
+            return {}
+        if test := self.request_tool_definition_extra.get(idx):
             return test.value
         return {}
 

@@ -14,11 +14,15 @@ inc = IncludeTest.create
 
 def create_test_case(
     request_top_level_extra: Optional[bool] = None,
+    request_tool_definition_extra: Optional[bool] = None,
     request_message_extra: Optional[bool] = None,
     response_top_level_extra: Optional[bool] = None,
     response_message_extra: Optional[bool] = None,
 ) -> TestCase:
     return TestCase(
+        request_tool_definition_extra={
+            0: inc(request_tool_definition_extra, {"custom_fields": "foobar"})
+        },
         request_top_level_extra=inc(
             request_top_level_extra,
             {"custom_fields": {"configuration": {"a": "b"}}},
@@ -87,6 +91,7 @@ def with_langchain(is_azure: bool, monkey_patch: bool):
 
 def get_openai_test_case():
     return create_test_case(
+        request_tool_definition_extra=True,
         request_top_level_extra=True,
         request_message_extra=True,
         response_top_level_extra=True,

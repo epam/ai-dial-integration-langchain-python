@@ -69,6 +69,16 @@ async def run_test_openai_stream(test_case: TestCase):
     ] = await openai_client.chat.completions.create(
         stream=True,
         model="dummy",
+        tools=[
+            {
+                "type": "function",
+                "function": {  # type: ignore
+                    "name": "dummy_function",
+                    "description": "A dummy function for testing.",
+                    **test_case.request_tool_definition_extra_fields(0),
+                },
+            }
+        ],
         messages=[
             {
                 "role": "user",
@@ -96,6 +106,16 @@ async def run_test_openai_block(test_case: TestCase):
     response: ChatCompletion = await openai_client.chat.completions.create(
         stream=False,
         model="dummy",
+        tools=[
+            {
+                "type": "function",
+                "function": {  # type: ignore
+                    "name": "dummy_function",
+                    "description": "A dummy function for testing.",
+                    **test_case.request_tool_definition_extra_fields(0),
+                },
+            }
+        ],
         messages=[
             {
                 "role": "user",
