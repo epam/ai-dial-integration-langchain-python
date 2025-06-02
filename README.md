@@ -1,6 +1,8 @@
 # Overview
 
-The package provides useful integration of DIAL API with Langchain library.
+[![PyPI version](https://img.shields.io/pypi/v/aidial-integration-langchain.svg)](https://pypi.org/project/aidial-integration-langchain/)
+
+The package provides helpers facilitating integration of DIAL API with Langchain library.
 
 ## Passing DIAL-specific extra fields in Langchain requests/responses
 
