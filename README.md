@@ -4,7 +4,7 @@ The package provides useful integration of DIAL API with Langchain library.
 
 ## Passing DIAL-specific extra fields in Langchain requests/responses
 
-`langchain-openai` library [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
+Unlike `openai` library, `langchain-openai` library [doesn't allow](https://github.com/langchain-ai/langchain/issues/26617) to pass extra request/response parameters to/from the upstream model.
 
 The minimal example highlighting the issue could be found in the [example folder](https://github.com/epam/ai-dial-integration-langchain-python/tree/development/example):
 
@@ -18,9 +18,9 @@ python -m app
 
 ```text
 Received the following extra fields:
-(1) ☑ request.tools[0].extra_field
-(2) ☐ request.messages[0].extra_field
-(3) ☑ request.extra_field
+(1) ☑ request.extra_field
+(2) ☑ request.tools[0].extra_field
+(3) ☐ request.messages[0].extra_field
 (4) ☐ response.message.extra_field
 (5) ☐ response.extra_field
 ```
@@ -65,9 +65,9 @@ python -m app patch
 
 ```text
 Received the following extra fields:
-(1) ☑ request.tools[0].extra_field
-(2) ☑ request.messages[0].extra_field
-(3) ☑ request.extra_field
+(1) ☑ request.extra_field
+(2) ☑ request.tools[0].extra_field
+(3) ☑ request.messages[0].extra_field
 (4) ☑ response.message.extra_field
 (5) ☑ response.extra_field
 ```

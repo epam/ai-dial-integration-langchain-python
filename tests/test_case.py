@@ -1,6 +1,9 @@
-from typing import Dict
+from __future__ import annotations
+
+from typing import Dict, List, Optional
 
 from openai import BaseModel
+from openai.types.chat import ChatCompletionToolParam
 
 
 def _is_subdict(small: dict, big: dict) -> bool:
@@ -15,7 +18,11 @@ class IncludeTest(BaseModel):
     value: dict
 
     @classmethod
-    def create(cls, include: bool, value: dict):
+    def create(
+        cls, include: Optional[bool], value: dict
+    ) -> Optional[IncludeTest]:
+        if include is None:
+            return None
         return cls(include=include, value=value)
 
     def is_valid(self, other: dict) -> bool:
@@ -32,7 +39,52 @@ class IncludeTest(BaseModel):
 class TestCase(BaseModel):
     __test__ = False
 
-    request_top_level_extra: IncludeTest
-    request_message_extra: Dict[int, IncludeTest]
-    response_top_level_extra: IncludeTest
-    response_message_extra: IncludeTest
+    request_top_level: Optional[IncludeTest] = None
+    request_tool_definition: Optional[Dict[int, Optional[IncludeTest]]] = None
+    request_message: Optional[Dict[int, Optional[IncludeTest]]] = None
+    response_top_level: Optional[IncludeTest] = None
+    response_message: Optional[IncludeTest] = None
+
+    def request_message_extra_fields(self, idx: int) -> Dict[int, dict]:
+        if not self.request_message:
+            return {}
+        if test := self.request_message.get(idx):
+            return test.value
+        return {}
+
+    def request_tool_definition_extra_fields(self, idx: int) -> Dict[int, dict]:
+        if not self.request_tool_definition:
+            return {}
+        if test := self.request_tool_definition.get(idx):
+            return test.value
+        return {}
+
+    @property
+    def request_top_level_extra_fields(self) -> dict:
+        if not self.request_top_level:
+            return {}
+        return self.request_top_level.value
+
+    @property
+    def response_message_extra_fields(self) -> dict:
+        if not self.response_message:
+            return {}
+        return self.response_message.value
+
+    @property
+    def response_top_level_extra_fields(self) -> dict:
+        if not self.response_top_level:
+            return {}
+        return self.response_top_level.value
+
+    def create_tools(self) -> List[ChatCompletionToolParam]:
+        return [
+            {
+                "type": "function",
+                "function": {
+                    "name": "dummy_function",
+                    "description": "A dummy function for testing.",
+                },
+                **self.request_tool_definition_extra_fields(0),  # type: ignore
+            }
+        ]
