@@ -5,7 +5,6 @@ PY_FACTOR=${PYTHON:+py${PYTHON//./}}
 
 echo "PYTHON=$PYTHON"
 echo "PY_FACTOR=$PY_FACTOR"
-echo "PARALLEL=$PARALLEL"
 
 "$UV" tool run tox \
   --parallel auto \
