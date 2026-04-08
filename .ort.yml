@@ -12,6 +12,6 @@ excludes:
       comment: "Packages for testing only."
 resolutions:
   rule_violations:
-    - message: ".*PyPI::(anyio|httpcore|httpx|idna|packaging|pydantic|pydantic-core|regex|tiktoken|typing-extensions|typing-inspection|urllib3|uuid-utils|zstandard).*"
+    - message: ".*PyPI::(anyio|httpcore|httpx|idna|packaging|pydantic|pydantic-core|regex|tiktoken|typing-extensions|typing-inspection|urllib3|uuid-utils|zstandard|langgraph|langgraph-sdk|langgraph-checkpoint|langgraph-prebuilt).*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "ORT cannot pick up license information"
