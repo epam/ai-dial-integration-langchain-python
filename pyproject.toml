@@ -5,10 +5,10 @@ description = "Utilities for integration of AI DIAL API with Langchain library"
 authors = [{ name = "EPAM RAIL", email = "SpecialEPM-DIALDevTeam@epam.com" }]
 license = "Apache-2.0"
 readme = "README.md"
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.10,<4.0"
 dependencies = [
-    "langchain<0.4",
-    "langchain-core<0.4",
+    "langchain<2",
+    "langchain-core<2",
     "langchain-openai>=0.1.1,<0.4",
     "openai>=1.48,<2",
 ]
@@ -17,7 +17,7 @@ dependencies = [
 test = ["pytest>=7.4.2", "pytest-asyncio>=0.21.1", "httpx==0.27.2"]
 lint = [
     "flake8>=6.0.0",
-    "black>=23.3,<25.0",
+    "black>=26.3.1",
     "isort>=5.12.0",
     "pyright>=1.1.324",
     "autoflake>=2.2.0",

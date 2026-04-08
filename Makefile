@@ -7,7 +7,7 @@ all: install
 init_env:
 	python -m venv $(VENV_DIR)
 	$(VENV_DIR)/bin/pip install uv==$(UV_VERSION) --quiet
-	$(UV) tool install tox==4.15.1 --with tox-uv
+	$(UV) tool install --python $(VENV_DIR)/bin/python tox==4.52.0 --with tox-uv==1.34.0
 
 install: init_env
 	$(UV) sync --quiet --all-extras
