@@ -1,11 +1,12 @@
 VENV_DIR ?= .venv
+PYTHON ?= python
 UV ?= $(VENV_DIR)/bin/uv
 UV_VERSION ?= 0.7.3
 
 all: install
 
 init_env:
-	python3.11 -m venv $(VENV_DIR)
+	$(PYTHON) -m venv $(VENV_DIR)
 	$(VENV_DIR)/bin/pip install uv==$(UV_VERSION) --quiet
 	$(UV) tool install --python $(VENV_DIR)/bin/python tox==4.52.0 --with tox-uv
 
